@@ -47,6 +47,7 @@ import forestry.api.core.IErrorState;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.EnumTolerance;
 import forestry.api.genetics.IAllele;
+import forestry.api.genetics.IAlleleInteger;
 import forestry.api.genetics.IAlleleTolerance;
 import forestry.api.genetics.IChromosome;
 import forestry.api.genetics.IEffectData;
@@ -54,6 +55,8 @@ import forestry.api.genetics.IFlowerProvider;
 import forestry.api.genetics.IIndividual;
 import forestry.api.genetics.IMutation;
 import forestry.api.genetics.IPollinatable;
+import forestry.api.lepidopterology.EnumButterflyChromosome;
+import forestry.apiculture.genetics.alleles.AlleleEffectNone;
 import forestry.arboriculture.genetics.pollination.FakePollinatable;
 import forestry.arboriculture.genetics.pollination.ICheckPollinatable;
 import forestry.core.config.Config;
@@ -62,6 +65,7 @@ import forestry.core.errors.EnumErrorCode;
 import forestry.core.genetics.Chromosome;
 import forestry.core.genetics.GenericRatings;
 import forestry.core.genetics.IndividualLiving;
+import forestry.core.genetics.alleles.AlleleBoolean;
 import forestry.core.utils.GeneticsUtil;
 import forestry.core.utils.Log;
 import forestry.core.utils.StringUtil;
@@ -368,7 +372,12 @@ public class Bee extends IndividualLiving implements IBee {
 
 	@Override
 	public void addTooltip(List<String> list) {
-
+		final EnumChatFormatting gray = EnumChatFormatting.DARK_GRAY;
+		EnumChatFormatting colour = EnumChatFormatting.GRAY;
+		IAllele active, inactive;
+		StringBuilder gui;
+		String value;
+		
 		// No info 4 u!
 		if (!isAnalyzed) {
 			list.add("<" + StringUtil.localize("gui.unknown") + ">");
@@ -397,36 +406,181 @@ public class Bee extends IndividualLiving implements IBee {
 			String generationString = rarity.rarityColor + StringUtil.localizeAndFormat("gui.beealyzer.generations", generation);
 			list.add(generationString);
 		}
+		
+		// lifespan
+		active = genome.getActiveAllele(EnumBeeChromosome.LIFESPAN);
+		inactive = genome.getInactiveAllele(EnumBeeChromosome.LIFESPAN);
+		gui = new StringBuilder();
+		gui.append(EnumChatFormatting.DARK_GREEN);
+		gui.append(StringUtil.localize("gui.life"));
+		gui.append(": ");
+		this.Allele(gui, active.getName(), inactive.getName());
+		list.add(gui.toString());
 
-		IAllele speedAllele = genome.getActiveAllele(EnumBeeChromosome.SPEED);
-		IAlleleTolerance tempToleranceAllele = (IAlleleTolerance) getGenome().getActiveAllele(EnumBeeChromosome.TEMPERATURE_TOLERANCE);
-		IAlleleTolerance humidToleranceAllele = (IAlleleTolerance) getGenome().getActiveAllele(EnumBeeChromosome.HUMIDITY_TOLERANCE);
-
-		String unlocalizedCustomSpeed = "tooltip.worker." + speedAllele.getUnlocalizedName().replaceAll("(.*)\\.", "");
-		String speed;
-		if (StringUtil.canTranslate(unlocalizedCustomSpeed)) {
-			speed = StringUtil.localize(unlocalizedCustomSpeed);
+		// speed
+		active = genome.getActiveAllele(EnumBeeChromosome.SPEED);
+		inactive = genome.getInactiveAllele(EnumBeeChromosome.SPEED);
+		value = "tooltip.worker." + active.getUnlocalizedName().replaceAll("(.*)\\.", "");
+		if (StringUtil.canTranslate(value)) {
+			list.add(StringUtil.localize(value));
 		} else {
-			speed = speedAllele.getName() + ' ' + StringUtil.localize("gui.worker");
+			gui = new StringBuilder();
+			gui.append(EnumChatFormatting.DARK_RED);
+			gui.append(StringUtil.localize("gui.worker"));
+			gui.append(": ");
+			this.Allele(gui, active.getName(), inactive.getName());
+			list.add(gui.toString());
 		}
 
-		String lifespan = genome.getActiveAllele(EnumBeeChromosome.LIFESPAN).getName() + ' ' + StringUtil.localize("gui.life");
-		String tempTolerance = EnumChatFormatting.GREEN + "T: " + AlleleManager.climateHelper.toDisplay(genome.getPrimary().getTemperature()) + " / " + tempToleranceAllele.getName();
-		String humidTolerance = EnumChatFormatting.GREEN + "H: " + AlleleManager.climateHelper.toDisplay(genome.getPrimary().getHumidity()) + " / " + humidToleranceAllele.getName();
-		String flowers = genome.getFlowerProvider().getDescription();
+		// tempTolerance
+		active = getGenome().getActiveAllele(EnumBeeChromosome.TEMPERATURE_TOLERANCE);
+		inactive = getGenome().getInactiveAllele(EnumBeeChromosome.TEMPERATURE_TOLERANCE);
+		gui = new StringBuilder();
+		gui.append(EnumChatFormatting.GREEN);
+		gui.append("T: ");
+		gui.append(AlleleManager.climateHelper.toDisplay(primary.getTemperature()));
+		gui.append(" / ");
+		this.Allele(gui, active.getName(), inactive.getName());
+		list.add(gui.toString());
 
-		list.add(lifespan);
-		list.add(speed);
-		list.add(tempTolerance);
-		list.add(humidTolerance);
-		list.add(flowers);
+		// humidTolerance
+		active = getGenome().getActiveAllele(EnumBeeChromosome.HUMIDITY_TOLERANCE);
+		inactive = getGenome().getInactiveAllele(EnumBeeChromosome.HUMIDITY_TOLERANCE);
+		gui = new StringBuilder();
+		gui.append(EnumChatFormatting.GREEN);
+		gui.append("H: ");
+		gui.append(AlleleManager.climateHelper.toDisplay(primary.getHumidity()));
+		gui.append(" / ");
+		this.Allele(gui, active.getName(), inactive.getName());
+		list.add(gui.toString());
 
-		if (genome.getNocturnal()) {
-			list.add(EnumChatFormatting.RED + GenericRatings.rateActivityTime(genome.getNocturnal(), false));
+		// flowers
+		active = genome.getActiveAllele(EnumBeeChromosome.FLOWER_PROVIDER);
+		inactive = genome.getInactiveAllele(EnumBeeChromosome.FLOWER_PROVIDER);
+		gui = new StringBuilder();
+		gui.append(EnumChatFormatting.LIGHT_PURPLE);
+		gui.append(StringUtil.localize("gui.flowers.tooltip"));
+		gui.append(": ");
+		this.Allele(gui, active.getName(), inactive.getName());
+		list.add(gui.toString());
+
+		// fertility
+		int num1 = ((IAlleleInteger)genome.getActiveAllele(EnumBeeChromosome.FERTILITY)).getValue();
+		int num0 = ((IAlleleInteger)genome.getInactiveAllele(EnumBeeChromosome.FERTILITY)).getValue();
+		colour = EnumChatFormatting.LIGHT_PURPLE;
+		gui = new StringBuilder();
+		gui.append(colour);
+		gui.append(StringUtil.localize("gui.fertility.tooltip"));
+		gui.append(": ");
+		if ((num1 ^ num0) > 0) {
+			if (num1 > num0) {
+				gui.append(gray);
+				gui.append(num0);
+				gui.append(colour);
+				gui.append(" - ");
+				gui.append(num1);
+			} else {
+				gui.append(num1);
+				gui.append(" - ");
+				gui.append(gray);
+				gui.append(num0);
+			}
+		} else {
+			gui.append(num1);
 		}
+		list.add(gui.toString());
 
-		if (genome.getTolerantFlyer()) {
-			list.add(EnumChatFormatting.WHITE + StringUtil.localize("gui.flyer.tooltip"));
+		// -- start -- 
+		// diurnal
+		AlleleBoolean inactiveBoolean;
+		gui = new StringBuilder();
+		gui.append(EnumChatFormatting.AQUA);
+		gui.append(StringUtil.localize("gui.diurnal"));
+		
+		// nocturnal
+		inactiveBoolean = (AlleleBoolean)genome.getInactiveAllele(EnumBeeChromosome.NOCTURNAL);
+		this.Allele(gui, genome.getNocturnal(), inactiveBoolean.getValue(), "gui.nocturnal", EnumChatFormatting.RED);
+
+		// flyer
+		inactiveBoolean = (AlleleBoolean)genome.getInactiveAllele(EnumBeeChromosome.TOLERANT_FLYER);
+		this.Allele(gui, genome.getTolerantFlyer(), inactiveBoolean.getValue(), "gui.flyer.tooltip", EnumChatFormatting.WHITE);
+
+		// cave
+		inactiveBoolean = (AlleleBoolean)genome.getInactiveAllele(EnumBeeChromosome.CAVE_DWELLING);
+		this.Allele(gui, genome.getCaveDwelling(), inactiveBoolean.getValue(), "gui.cave", EnumChatFormatting.BLUE);
+		
+		list.add(gui.toString());
+		// -- end --
+		
+		// area
+		colour = EnumChatFormatting.DARK_AQUA;
+		active = genome.getActiveAllele(EnumBeeChromosome.TERRITORY);
+		inactive = genome.getInactiveAllele(EnumBeeChromosome.TERRITORY);
+		gui = new StringBuilder();
+		gui.append(colour);
+		gui.append(StringUtil.localize("gui.area"));
+		gui.append(": ");
+		gui.append(active.getName());
+		gui.append(' ');
+		gui.append(inactive.getName());
+		list.add(gui.toString());
+		
+		// effect
+		final String alleleEffect = "forestry.allele.effect.none";
+		gui = new StringBuilder();
+		active = genome.getActiveAllele(EnumBeeChromosome.EFFECT);
+		inactive = genome.getInactiveAllele(EnumBeeChromosome.EFFECT);
+		Boolean a = !active.getUnlocalizedName().equals(alleleEffect);
+		Boolean b = !inactive.getUnlocalizedName().equals(alleleEffect);
+		if (a || b)
+		{
+			colour = EnumChatFormatting.GOLD;
+			gui.append(colour);
+			gui.append(StringUtil.localize("gui.effect.tooltip"));
+			// gui.append(EnumChatFormatting.WHITE);
+			gui.append(": ");
+			if (a) {
+				gui.append(colour);
+				gui.append(active.getName());
+				if (b) {
+					gui.append(' ');
+				}
+			}
+			if (b) {
+				gui.append(gray);
+				gui.append(inactive.getName());
+			}
+			list.add(gui.toString());
+		}
+	}
+	
+	private void Allele(StringBuilder value, boolean active, boolean inactive, String guiKey, EnumChatFormatting colour) {
+		if (active || inactive)
+		{
+			value.append(' ');
+			value.append(colour);
+			value.append(StringUtil.localize(guiKey));
+			if (active ^ inactive)
+			{
+				final EnumChatFormatting gray = EnumChatFormatting.DARK_GRAY;
+				value.append('(');
+				value.append(active ? colour : gray);
+				value.append(active ? '1' : '0');
+				value.append(inactive ? colour : gray);
+				value.append(inactive ? '1' : '0');
+				value.append(colour);
+				value.append(')');
+			}
+		}
+	}
+	
+	private void Allele(StringBuilder value, String active, String inactive) {
+		final EnumChatFormatting gray = EnumChatFormatting.DARK_GRAY;
+		value.append(active);
+		if (!active.equals(inactive)) {
+			value.append(' ');
+			value.append(gray);
+			value.append(inactive);
 		}
 	}
 

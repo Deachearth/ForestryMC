@@ -73,6 +73,7 @@ public class ItemBackpack extends ItemWithGui {
 
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer player) {
+		CurrentItem(player);
 		if (!world.isRemote) {
 			if (!player.isSneaking()) {
 				openGui(player);

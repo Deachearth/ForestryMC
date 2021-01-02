@@ -42,7 +42,7 @@ public class ItemElectronTube extends ItemOverlay {
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean flag) {
 		Multimap<ICircuitLayout, ICircuit> circuits = getCircuits(itemstack);
 		if (circuits.size() > 0) {
-			if (Proxies.common.isShiftDown()) {
+//			if (Proxies.common.isShiftDown()) {
 				for (ICircuitLayout circuitLayout : circuits.keys()) {
 					String circuitLayoutName = circuitLayout.getUsage();
 					list.add(EnumChatFormatting.WHITE.toString() + EnumChatFormatting.UNDERLINE + circuitLayoutName);
@@ -50,9 +50,9 @@ public class ItemElectronTube extends ItemOverlay {
 						circuit.addTooltip(list);
 					}
 				}
-			} else {
-				list.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
-			}
+//			} else {
+//				list.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
+//			}
 		} else {
 			list.add("<" + StringUtil.localize("gui.noeffect") + ">");
 		}

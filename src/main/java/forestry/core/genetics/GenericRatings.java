@@ -12,6 +12,8 @@ package forestry.core.genetics;
 
 import net.minecraft.util.StatCollector;
 
+import java.nio.Buffer;
+
 import forestry.core.utils.StringUtil;
 
 public class GenericRatings {
@@ -35,6 +37,7 @@ public class GenericRatings {
 	}
 
 	public static String rateActivityTime(boolean nocturnalTrait, boolean naturalNocturnal) {
+		
 		String active = naturalNocturnal ? StringUtil.localize("gui.nocturnal") : StringUtil.localize("gui.diurnal");
 		if (nocturnalTrait) {
 			active = StringUtil.append(", ", active, naturalNocturnal ? StringUtil.localize("gui.diurnal") : StringUtil.localize("gui.nocturnal"));

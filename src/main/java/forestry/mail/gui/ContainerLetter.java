@@ -11,11 +11,13 @@
 package forestry.mail.gui;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraftforge.common.UsernameCache;
 
 import com.mojang.authlib.GameProfile;
 
@@ -137,7 +139,8 @@ public class ContainerLetter extends ContainerItemInventory<ItemInventoryLetter>
 	private static IMailAddress getRecipient(String recipientName, EnumAddressee type) {
 		switch (type) {
 			case PLAYER: {
-				GameProfile gameProfile = MinecraftServer.getServer().func_152358_ax().func_152655_a(recipientName);
+				// gameProfile = MinecraftServer.getServer().func_152358_ax().func_152655_a(recipientName);
+				GameProfile gameProfile = getUsernameCache(recipientName);
 				if (gameProfile == null) {
 					gameProfile = new GameProfile(new UUID(0, 0), recipientName);
 				}
@@ -149,6 +152,20 @@ public class ContainerLetter extends ContainerItemInventory<ItemInventoryLetter>
 			default:
 				return null;
 		}
+	}
+	
+	private static GameProfile getUsernameCache(String recipientName) {
+		Map<UUID, String> map = UsernameCache.getMap();
+		for (Map.Entry<UUID, String> mapValue : map.entrySet()) {
+			if (mapValue.getValue().equals(recipientName))
+			{
+				GameProfile gameProfile = MinecraftServer.getServer().func_152358_ax().func_152652_a(mapValue.getKey());
+				if (gameProfile == null) {
+					return new GameProfile(mapValue.getKey(), mapValue.getValue());
+				}
+			}
+		}
+		return null;
 	}
 
 	public IMailAddress getRecipient() {

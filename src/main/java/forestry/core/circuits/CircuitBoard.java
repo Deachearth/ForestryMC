@@ -63,11 +63,11 @@ public class CircuitBoard<T> implements ICircuitBoard {
 			}
 		}
 
-		if (Proxies.common.isShiftDown() || extendedTooltip.size() <= 4) {
+//		if (Proxies.common.isShiftDown() || extendedTooltip.size() <= 4) {
 			list.addAll(extendedTooltip);
-		} else {
-			list.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
-		}
+//		} else {
+//			list.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
+//		}
 	}
 
 	@Override

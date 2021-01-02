@@ -82,7 +82,7 @@ public class FilteredTank extends StandardTank {
 		}
 
 		toolTip.clear();
-		if (Proxies.common.isShiftDown() || filters.size() < 5) {
+//		if (Proxies.common.isShiftDown() || filters.size() < 5) {
 			for (String filterName : filters) {
 				Fluid fluidFilter = FluidRegistry.getFluid(filterName);
 				EnumRarity rarity = fluidFilter.getRarity();
@@ -93,9 +93,9 @@ public class FilteredTank extends StandardTank {
 				ToolTipLine name = new ToolTipLine(fluidFilter.getLocalizedName(filterFluidStack), rarity.rarityColor, 2);
 				toolTip.add(name);
 			}
-		} else {
-			toolTip.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
-		}
+//		} else {
+//			toolTip.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
+//		}
 
 		toolTip.add(String.format("%,d", getFluidAmount()) + " / " + String.format("%,d", getCapacity()));
 	}

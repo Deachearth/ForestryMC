@@ -17,7 +17,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-
+import forestry.core.items.ItemWithGui;
 import forestry.core.tiles.IFilterSlotDelegate;
 
 public abstract class ItemInventory implements IInventory, IFilterSlotDelegate {
@@ -29,6 +29,7 @@ public abstract class ItemInventory implements IInventory, IFilterSlotDelegate {
 	private final EntityPlayer player;
 	private final ItemStack parent;
 	private final ItemStack[] inventoryStacks;
+	private final int currentItem = ItemWithGui.CurrentItem();
 
 	public ItemInventory(EntityPlayer player, int size, ItemStack parent) {
 		this.player = player;
@@ -67,8 +68,6 @@ public abstract class ItemInventory implements IInventory, IFilterSlotDelegate {
 	}
 
 	private void setUID() {
-		ItemStack parent = getParent();
-
 		if (parent.getTagCompound() == null) {
 			parent.setTagCompound(new NBTTagCompound());
 		}
@@ -96,15 +95,15 @@ public abstract class ItemInventory implements IInventory, IFilterSlotDelegate {
 		if (base == null || comparison == null) {
 			return false;
 		}
-
+		
 		if (base.getItem() != comparison.getItem()) {
 			return false;
 		}
-
+		
 		if (!base.hasTagCompound() || !comparison.hasTagCompound()) {
 			return false;
 		}
-
+		
 		String baseUID = base.getTagCompound().getString(KEY_UID);
 		String comparisonUID = comparison.getTagCompound().getString(KEY_UID);
 		return baseUID != null && comparisonUID != null && baseUID.equals(comparisonUID);
@@ -260,7 +259,7 @@ public abstract class ItemInventory implements IInventory, IFilterSlotDelegate {
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return true;
+		return currentItem == entityplayer.inventory.currentItem;
 	}
 
 	@Override

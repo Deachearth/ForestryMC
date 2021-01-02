@@ -72,11 +72,11 @@ public abstract class ItemGE extends ItemForestry {
 		IIndividual individual = getIndividual(itemstack);
 
 		if (individual.isAnalyzed()) {
-			if (Proxies.common.isShiftDown()) {
+//			if (Proxies.common.isShiftDown()) {
 				individual.addTooltip(list);
-			} else {
-				list.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
-			}
+//			} else {
+//				list.add(EnumChatFormatting.ITALIC + "<" + StringUtil.localize("gui.tooltip.tmi") + ">");
+//			}
 		} else {
 			list.add("<" + StringUtil.localize("gui.unknown") + ">");
 		}

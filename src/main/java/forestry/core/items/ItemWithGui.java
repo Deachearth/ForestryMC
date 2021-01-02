@@ -20,12 +20,23 @@ import forestry.core.gui.GuiHandler;
 import forestry.core.gui.IGuiHandlerItem;
 
 public abstract class ItemWithGui extends ItemForestry implements IGuiHandlerItem {
+	private static int _CurrentItem;
+	
+	public static int CurrentItem() {
+		return _CurrentItem;
+	}
+	
+	protected static void CurrentItem(EntityPlayer entityplayer) {
+		_CurrentItem = entityplayer.inventory.currentItem;
+	}
+	
 	public ItemWithGui() {
 		setMaxStackSize(1);
 	}
 
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
+		CurrentItem(entityplayer);
 		if (!world.isRemote) {
 			openGui(entityplayer);
 		}
